@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Employee {
+  id                 Int                  @id @default(autoincrement())
+  createdAt          DateTime             @default(now()) @db.Timestamptz()
+  updatedAt          DateTime             @updatedAt @db.Timestamptz()
+  email              String               @db.VarChar(80) @unique
+  hash               String               @db.VarChar(80)
+  firstName          String?              @db.VarChar(40)
+  lastName           String?              @db.VarChar(40)
+  emergencyContact   String?              @db.VarChar(80)
+  emergencyNumber    String?              @db.VarChar(20)
+  bloodType          String              @db.VarChar(8)
+  role               Role                 @default(EMPLOYEE)
+  EmployeePermission EmployeePermission[]
+
+  @@map("employees")
+}
+
+enum Role {
+  EMPLOYEE
+  ADMINISTRATOR
+}
+
+model EmployeePermission {
+  usedId       Int
+  employee     Employee   @relation(fields: [usedId], references: [id])
+  permissionId Int
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  assignedAt   DateTime   @default(now()) @db.Timestamptz()
+  assignedBy   String
+
+  @@id([usedId, permissionId])
+  @@map("employees-permissions")
+}
+
+model Permission {
+  id                 Int                  @id @default(autoincrement())
+  name               String @db.VarChar(20) @unique
+  description        String? @db.VarChar(160)
+  EmployeePermission EmployeePermission[]
+
+  @@map("permissions")
+}
