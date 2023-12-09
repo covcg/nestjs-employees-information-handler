@@ -2,28 +2,17 @@ import {
   IsEmail,
   IsNotEmpty,
   IsString,
-  Length,
+  IsStrongPassword,
   MaxLength,
 } from 'class-validator';
 
-export class SignupDto {
+export class AuthDto {
   @IsEmail()
   @IsNotEmpty()
   @MaxLength(80)
   email: string;
 
   @IsString()
-  @Length(8, 80)
-  password: string;
-}
-
-export class SigninDto {
-  @IsEmail()
-  @IsNotEmpty()
-  @MaxLength(80)
-  email: string;
-
-  @IsString()
-  @Length(8, 80)
+  @IsStrongPassword()
   password: string;
 }

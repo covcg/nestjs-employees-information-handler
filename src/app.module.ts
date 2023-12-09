@@ -6,6 +6,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { EmployeesModule } from './employees/employees.module';
+import { PermissionsService } from './permissions/permissions.service';
+import { PermissionsModule } from './permissions/permissions.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { EmployeesModule } from './employees/employees.module';
       installSubscriptionHandlers: true,
     }),
     EmployeesModule,
+    PermissionsModule,
   ],
+  providers: [PermissionsService],
 })
 export class AppModule {}

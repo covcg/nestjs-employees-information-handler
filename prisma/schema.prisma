@@ -15,14 +15,14 @@ model Employee {
   createdAt          DateTime             @default(now()) @db.Timestamptz()
   updatedAt          DateTime             @updatedAt @db.Timestamptz()
   email              String               @db.VarChar(80) @unique
-  hash               String               @db.VarChar(80)
+  hash               String               @db.VarChar(128)
   firstName          String?              @db.VarChar(40)
   lastName           String?              @db.VarChar(40)
   emergencyContact   String?              @db.VarChar(80)
   emergencyNumber    String?              @db.VarChar(20)
-  bloodType          String              @db.VarChar(8)
+  bloodType          String?              @db.VarChar(8)
   role               Role                 @default(EMPLOYEE)
-  EmployeePermission EmployeePermission[]
+  employeePermissions EmployeePermission[]
 
   @@map("employees")
 }
@@ -48,7 +48,7 @@ model Permission {
   id                 Int                  @id @default(autoincrement())
   name               String @db.VarChar(20) @unique
   description        String? @db.VarChar(160)
-  EmployeePermission EmployeePermission[]
+  employeePermissions EmployeePermission[]
 
   @@map("permissions")
 }
