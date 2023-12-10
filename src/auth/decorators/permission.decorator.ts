@@ -1,6 +1,6 @@
 import { PermissionsEnum } from 'src/permissions/permissions.dto';
 
-export const PERMISSIONS_KEY = 'permissions'
+export const PERMISSIONS_KEY = 'permissions';
 export const WithPermission = (permission: PermissionsEnum) => {
   const decoratorFactory = (target, key, descriptor) => {
     let permissions = Reflect.getMetadata(PERMISSIONS_KEY, target);

@@ -27,7 +27,6 @@ export class AuthGuard implements CanActivate {
       context.getClass(),
     ]);
     if (isPublic) {
-      // 💡 See this condition
       return true;
     }
 
@@ -36,48 +35,61 @@ export class AuthGuard implements CanActivate {
     if (!token) {
       throw new UnauthorizedException();
     }
-    let payload;
-    try {
-      payload = await this.jwtService.verifyAsync(token, {
-        secret: this.config.get('JWT_SECRET'),
-      });
-    } catch {
-      throw new UnauthorizedException('Invalid token');
+    const payload = await this.verifyToken(token);
+    const admin = await this.getAdministratorWithPermissions(payload.email);
+    this.validatePermission(
+      context,
+      admin.administratorPermissions.map((ap) => ap.permission.code),
+    );
+    request['admin'] = admin;
+    return true;
+  }
+
+  private validatePermission(context, adminPermissions: string[]) {
+    const permissions = this.reflector.getAllAndOverride<string[]>(
+      PERMISSIONS_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+    if (permissions && permissions.length > 0) {
+      for (const permission of permissions) {
+        if (!adminPermissions.some((ap) => ap === permission)) {
+          throw new UnauthorizedException('Insufficient permissions');
+        }
+      }
     }
-    let user;
+  }
+
+  private async getAdministratorWithPermissions(email: string) {
     try {
-      user = await this.prisma.employee.findUnique({
+      const admin = await this.prisma.administrator.findUnique({
         where: {
-          id: payload.id,
+          email,
         },
         include: {
-          employeePermissions: {
+          administratorPermissions: {
             include: {
               permission: true,
             },
           },
         },
       });
+      return admin;
     } catch (error) {
       throw new UnauthorizedException('Invalid token');
     }
-    const permissions = this.reflector.getAllAndOverride<string[]>(
-      PERMISSIONS_KEY,
-      [context.getHandler(), context.getClass()],
-    );
-    if (permissions.length > 0) {
-      for (const permission of permissions) {
-        if (
-          !user.employeePermissions.some(
-            (ep) => ep.permission.name === permission,
-          )
-        ) {
-          throw new UnauthorizedException('Insufficient permissions');
-        }
-      }
+  }
+
+  private async verifyToken(token: string) {
+    try {
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: this.config.get('JWT_SECRET'),
+      });
+      return {
+        email: payload.email,
+      };
+    } catch {
+      throw new UnauthorizedException('Invalid token');
     }
-    request['user'] = user;
-    return true;
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
