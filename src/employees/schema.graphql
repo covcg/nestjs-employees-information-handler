@@ -3,21 +3,11 @@ type Employee {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
-  email: String!
-  hash: String!
   firstName: String
   lastName: String
   emergencyContact: String
   emergencyNumber: String
   bloodType: String
-  role: String!
-  permissions: [Permission!]!
-}
-
-type Permission {
-  id: ID!
-  name: String!
-  description: String
 }
 
 type Query {
@@ -27,14 +17,11 @@ type Query {
 
 
 input NewEmployee {
-  email: String!
-  hash: String!
   firstName: String
   lastName: String
   emergencyContact: String
   emergencyNumber: String
   bloodType: String
-  role: String!
 }
 
 input UpdateEmployee {
@@ -45,14 +32,8 @@ input UpdateEmployee {
   bloodType: String
 }
 
-input ChangeEmployeePassword {
-  email: String!
-  hash: String!
-}
-
 type Mutation {
-  createEmployee(input: NewEmployee!): Employee!
+  createEmployee(input: NewEmployee!): Employee
   updateEmployee(input: UpdateEmployee!): Employee
-  changeEmployeePassword(input: ChangeEmployeePassword): Employee
   deleteEmployee(id: ID!): Employee
 }
