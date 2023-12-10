@@ -6,7 +6,12 @@ import { AuthStrategy } from './auth.strategy';
 import { PermissionsModule } from 'src/permissions/permissions.module';
 
 @Module({
-  imports: [JwtModule.register({}), PermissionsModule],
+  imports: [
+    JwtModule.register({
+      global: true,
+    }),
+    PermissionsModule,
+  ],
   providers: [AuthService, AuthStrategy],
   controllers: [AuthController],
 })
