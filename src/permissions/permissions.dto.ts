@@ -4,6 +4,6 @@ export class Permission {
 }
 
 export enum PermissionsEnum {
-  CreateUser = 'create-user',
-  DeleteUser = 'delete-user',
+  CreateEmployee = 'create-employee',
+  DeleteEmployee = 'delete-employee',
 }

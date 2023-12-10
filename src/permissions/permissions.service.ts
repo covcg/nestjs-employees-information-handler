@@ -6,18 +6,18 @@ export class PermissionsService {
   constructor(private prisma: PrismaService) {}
 
   async getUserPermissions(userdId: number) {
-    const permissions = await this.prisma.employee.findUnique({
+    const permissions = await this.prisma.administrator.findUnique({
       where: {
         id: userdId,
       },
       include: {
-        employeePermissions: {
+        administratorPermissions: {
           include: {
             permission: true,
           },
         },
       },
     });
-    return permissions.employeePermissions.map((ep) => ep.permission);
+    return permissions.administratorPermissions.map((ep) => ep.permission);
   }
 }
