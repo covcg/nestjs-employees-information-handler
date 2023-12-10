@@ -11,44 +11,46 @@ datasource db {
 }
 
 model Employee {
-  id                 Int                  @id @default(autoincrement())
-  createdAt          DateTime             @default(now()) @db.Timestamptz()
-  updatedAt          DateTime             @updatedAt @db.Timestamptz()
-  email              String               @db.VarChar(80) @unique
-  hash               String               @db.VarChar(128)
-  firstName          String?              @db.VarChar(40)
-  lastName           String?              @db.VarChar(40)
-  emergencyContact   String?              @db.VarChar(80)
-  emergencyNumber    String?              @db.VarChar(20)
-  bloodType          String?              @db.VarChar(8)
-  role               Role                 @default(EMPLOYEE)
-  employeePermissions EmployeePermission[]
+  id               Int      @id @default(autoincrement())
+  createdAt        DateTime @default(now()) @db.Timestamptz()
+  updatedAt        DateTime @updatedAt @db.Timestamptz()
+  firstName        String?  @db.VarChar(40)
+  lastName         String?  @db.VarChar(40)
+  emergencyContact String?  @db.VarChar(80)
+  emergencyNumber  String?  @db.VarChar(20)
+  bloodType        String?  @db.VarChar(8)
+  qrCode           Bytes?   @db.ByteA
 
   @@map("employees")
 }
 
-enum Role {
-  EMPLOYEE
-  ADMINISTRATOR
+model Administrator {
+  id                      Int                       @id @default(autoincrement())
+  createdAt               DateTime                  @default(now()) @db.Timestamptz()
+  updatedAt               DateTime                  @updatedAt @db.Timestamptz()
+  email                   String                    @unique @db.VarChar(80)
+  hash                    String                    @db.VarChar(128)
+  administratorPermissions AdministratorPermission[]
 }
 
-model EmployeePermission {
-  usedId       Int
-  employee     Employee   @relation(fields: [usedId], references: [id])
-  permissionId Int
-  permission   Permission @relation(fields: [permissionId], references: [id])
-  assignedAt   DateTime   @default(now()) @db.Timestamptz()
-  assignedBy   String
+model AdministratorPermission {
+  usedId        Int
+  administrator Administrator @relation(fields: [usedId], references: [id])
+  permissionId  Int
+  permission    Permission    @relation(fields: [permissionId], references: [id])
+  assignedAt    DateTime      @default(now()) @db.Timestamptz()
+  assignedBy    String
 
   @@id([usedId, permissionId])
-  @@map("employees-permissions")
+  @@map("administrators-permissions")
 }
 
 model Permission {
-  id                 Int                  @id @default(autoincrement())
-  name               String @db.VarChar(20) @unique
-  description        String? @db.VarChar(160)
-  employeePermissions EmployeePermission[]
+  id                       Int                       @id @default(autoincrement())
+  code                     String                    @unique @db.VarChar(20)
+  name                     String?                   @db.VarChar(40)
+  description              String?                   @db.VarChar(160)
+  administratorPermissions AdministratorPermission[]
 
   @@map("permissions")
 }
